@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<robot name="mowbot_decorations" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <material name="orange"><color rgba="1.0 0.4235 0.0392 1.0"/></material>
+  <material name="grey"><color rgba="0.5 0.5 0.5 1.0"/></material>
+  <material name="black"><color rgba="0.0 0.0 0.0 1.0"/></material>
+
+</robot>

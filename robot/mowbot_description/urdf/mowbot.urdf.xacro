@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="mowbot">
+
+  <xacro:arg name="prefix" default="" />
+  <xacro:arg name="gazebo_controllers" default="$(find mowbot_gazebo)/config/gazebo_control.yaml" />
+
+  <xacro:include filename="$(find mowbot_description)/urdf/mowbot_macro.urdf.xacro" />
+
+  <!-- Load husky description -->
+  <xacro:mowbot prefix="$(arg prefix)" />
+
+  <xacro:if value="$(arg is_sim)">
+    <gazebo>
+      <plugin name="$(arg prefix)gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+        <parameters>$(arg gazebo_controllers)</parameters>
+      </plugin>
+
+      <!-- other sim -->
+
+    </gazebo>
+
+    <gazebo reference="$(arg prefix)base_visual">
+      <material>Gazebo/Orange</material>
+    </gazebo>
+
+
+  </xacro:if>
+
+
+
+</robot>

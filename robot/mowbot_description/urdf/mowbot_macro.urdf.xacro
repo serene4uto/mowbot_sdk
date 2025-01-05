@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:arg name="robot_namespace" default="/" />
+  <xacro:arg name="is_sim" default="false" />
+
+  <!-- Included URDF/XACRO Files -->
+  <xacro:include filename="$(find mowbot_description)/urdf/decorations.urdf.xacro" />
+  <xacro:include filename="$(find mowbot_description)/urdf/track.urdf.xacro" />
+  <xacro:include filename="$(find mowbot_description)/urdf/inertia_macros.xacro" />
+  <xacro:property name="M_PI" value="3.14159"/>
+
+  <xacro:macro name="mowbot" params="prefix">
+
+    <!-- Robot Size -->
+    <xacro:property name="robot_x_size" value="1.31600000" />
+    <xacro:property name="robot_y_size" value="1.24000000" />
+    <xacro:property name="robot_z_size" value="0.66160000" />  
+
+    <!-- Track Properties -->
+    <xacro:property name="track_x_size" value="0.968" />
+    <xacro:property name="track_y_size" value="0.15" />
+    <xacro:property name="track_z_size" value="0.1" />
+    <xacro:property name="track_wheel_radius" value="0.11" />
+    <xacro:property name="track_wheel_length" value="0.15" />
+
+    <!-- Track Mounting Position -->
+    <xacro:property name="track_mount_x_size" value="0.1" />
+    <xacro:property name="track_mount_y_size" value="${robot_y_size - track_wheel_length}" />
+    <xacro:property name="track_mount_vertical_offset" value="0.11" />
+
+    <!-- Body Box Size -->
+    <xacro:property name="body_box_x_size" value="${robot_x_size}" />
+    <xacro:property name="body_box_y_size" value="${robot_y_size}" />
+    <xacro:property name="body_box_z_size" value="${robot_z_size - 2*track_wheel_radius}" />
+
+    <!-- Robot mass -->
+    <xacro:property name="robot_mass" value="310" />
+    <xacro:property name="robot_body_mass" value="297" />
+    <xacro:property name="robot_track_mass" value="0.5" />
+    <xacro:property name="robot_track_wheel_mass" value="1" />
+
+    <!-- Base link is the center of the robot's bottom plate -->
+    <link name="${prefix}base_link">
+    </link>
+
+    <!-- body box link to store the robot's body inertia -->
+    <link name="${prefix}body_box">
+      <!-- <visual>
+        <geometry>
+          <box size="${body_box_x_size} ${body_box_y_size} ${body_box_z_size}"/>
+        </geometry>
+        <material name="grey"/>
+      </visual> -->
+      <collision>
+        <geometry>
+          <box size="${body_box_x_size} ${body_box_y_size} ${body_box_z_size}"/>
+        </geometry>
+      </collision>
+      <inertial_box mass="297" x="${body_box_x_size}" y="${body_box_y_size}" z="${body_box_z_size}">
+        <origin xyz="0 0 0" />
+        <!-- <origin xyz="0 0 ${0.5*(-body_box_z_size)}" /> -->
+      </inertial_box>
+    </link>
+
+    <joint name="${prefix}body_box_joint" type="fixed">
+      <origin xyz="0 0 ${0.5*(robot_z_size-2*track_wheel_radius)}" rpy="0 0 0" />
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}body_box" />
+    </joint>
+
+    <link name="${prefix}base_visual">
+      <visual>
+        <geometry>
+          <mesh filename="package://mowbot_description/meshes/mowbot_v02.stl" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="orange"/>
+      </visual>
+    </link>
+
+    <joint name="${prefix}base_visual_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}base_visual" />
+    </joint>
+
+    <link name="${prefix}base_footprint">
+    </link>
+
+    <joint name="${prefix}base_footprint_joint" type="fixed">
+      <origin xyz="0.0 0.0 -0.22" rpy="0.0 0.0 0.0"/>
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}base_footprint" />
+    </joint>
+
+
+    <!-- Track macros -->
+    <xacro:mowbot_track track_prefix="${prefix}left">
+      <origin xyz="${track_mount_x_size} ${0.5*track_mount_y_size} ${-track_mount_vertical_offset}" rpy="0 0 0"/>
+    </xacro:mowbot_track>
+
+    <xacro:mowbot_track track_prefix="${prefix}right">
+      <origin xyz="${track_mount_x_size} ${-0.5*track_mount_y_size} ${-track_mount_vertical_offset}" rpy="0 0 0"/>
+    </xacro:mowbot_track>
+
+    <!-- Include ROS2 Control -->
+    <xacro:include filename="$(find mowbot_description)/urdf/ros2_control.urdf.xacro" />
+
+
+  </xacro:macro>
+
+</robot>

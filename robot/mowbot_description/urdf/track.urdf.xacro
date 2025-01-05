@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mowbot_track">
+
+  <!-- Macro for a single track -->
+  <!-- TODO: try to fix the problem that the macros of inertia_macros.xacro are not working in this file -->
+  <xacro:macro name="mowbot_track" params="track_prefix *joint_pose">
+
+    <link name="${track_prefix}_track">
+      <!-- <visual>
+        <geometry>
+          <box size="${track_x_size} ${track_y_size} ${track_z_size}"/>
+        </geometry>
+        <material name="grey"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${track_x_size} ${track_y_size} ${track_z_size}"/>
+        </geometry>
+      </collision> -->
+
+      <!-- <inertial_box mass="${robot_track_mass}" x="${track_x_size}" y="${track_y_size}" z="${track_z_size}">
+          <origin xyz="0 0 0" />
+      </inertial_box> -->
+
+      <inertial>
+          <origin xyz="0 0 0" />
+          <mass value="${robot_track_mass}" />
+          <inertia ixx="${(1/12) * robot_track_mass * (track_y_size*track_y_size+track_z_size*track_z_size)}" ixy="0.0" ixz="0.0"
+                  iyy="${(1/12) * robot_track_mass * (track_x_size*track_x_size+track_z_size*track_z_size)}" iyz="0.0"
+                  izz="${(1/12) * robot_track_mass * (track_x_size*track_x_size+track_y_size*track_y_size)}" />
+      </inertial>
+    </link>
+
+    <joint name="${track_prefix}_track_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="${track_prefix}_track"/>
+      <xacro:insert_block name="joint_pose"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+
+    <!-- Track Wheel -->
+    <xacro:track_wheel
+      wheel_prefix="${track_prefix}_track_front"
+      parent_link="${track_prefix}_track"
+      mass="${robot_track_wheel_mass}"
+      radius="${track_wheel_radius}"
+      length="${track_wheel_length}"
+      origin_xyz="${-0.5*track_x_size} 0 0"
+    />
+
+    <xacro:track_wheel
+      wheel_prefix="${track_prefix}_track_rear"
+      parent_link="${track_prefix}_track"
+      mass="${robot_track_wheel_mass}"
+      radius="${track_wheel_radius}"
+      length="${track_wheel_length}"
+      origin_xyz="${0.5*track_x_size} 0 0"
+    />
+
+    <xacro:track_wheel
+      wheel_prefix="${track_prefix}_track_middle"
+      parent_link="${track_prefix}_track"
+      mass="${robot_track_wheel_mass}"
+      radius="${track_wheel_radius}"
+      length="${track_wheel_length}"
+      origin_xyz="0 0 0"
+    />
+
+  </xacro:macro>
+
+  <!-- Macro for track wheel -->
+  <xacro:macro name="track_wheel" params="wheel_prefix parent_link mass radius length origin_xyz">
+    <link name="${wheel_prefix}_wheel">
+      <visual>
+        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
+        <geometry>
+          <cylinder radius="${radius}" length="${length}"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
+        <geometry>
+          <cylinder radius="${radius}" length="${length}"/>
+        </geometry>
+      </collision>
+
+      <!-- <inertial_cylinder mass="${mass}" length="${length}" radius="${radius}">
+          <origin xyz="0 0 0" />
+      </inertial_cylinder> -->
+
+      <inertial>
+          <origin xyz="0 0 0" />
+          <mass value="${mass}" />
+          <inertia ixx="${(1/12) * mass * (3*radius*radius + length*length)}" ixy="0.0" ixz="0.0"
+                  iyy="${(1/12) * mass * (3*radius*radius + length*length)}" iyz="0.0"
+                  izz="${(1/2) * mass * (radius*radius)}" />
+      </inertial>
+
+    </link>
+
+    <joint name="${wheel_prefix}_wheel_joint" type="continuous">
+      <parent link="${parent_link}"/>
+      <child link="${wheel_prefix}_wheel"/>
+      <origin xyz="${origin_xyz}"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+
+    <gazebo reference="${wheel_prefix}_wheel">
+      <material>Gazebo/Black</material>
+      <mu1 value="5.0"/> <!-- Adjusted forward friction -->
+      <mu2 value="3.0"/> <!-- Adjusted lateral friction -->
+      <kp value="1000000.0"/> <!-- Tuned stiffness for stability -->
+      <kd value="1.0"/> <!-- Reduced damping -->
+      <fdir1 value="1 0 0"/> <!-- Aligned with forward motion -->
+      <contact>
+        <ode>
+          <mu value="5.0"/> <!-- Consistent friction -->
+          <mu2 value="3.0"/> <!-- Consistent lateral friction -->
+          <minDepth value="0.001"/> <!-- Minimize separation -->
+          <maxVel value="0.01"/> <!-- Slightly relaxed threshold -->
+        </ode>
+      </contact>
+    </gazebo>
+
+
+    
+  </xacro:macro>
+
+</robot>
