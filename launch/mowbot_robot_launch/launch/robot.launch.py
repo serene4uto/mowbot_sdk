@@ -15,7 +15,7 @@ ARGS = [
     ),
     DeclareLaunchArgument(
         'model',
-        default_value='mowbot_modelv3',
+        default_value='mowbot_gazebo_modelv3',
         description='mowbot model name'
     ),
     DeclareLaunchArgument(
