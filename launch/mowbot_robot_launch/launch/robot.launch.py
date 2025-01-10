@@ -1,11 +1,19 @@
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, SetLaunchConfiguration, LogInfo, GroupAction
+from launch.actions import (
+    DeclareLaunchArgument, 
+    SetLaunchConfiguration, 
+    GroupAction, 
+    IncludeLaunchDescription
+)
+from launch.conditions import IfCondition
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, Command, PathJoinSubstitution, FindExecutable
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.actions import Node
 
-from ament_index_python.packages import get_package_share_directory
+
+
 
 ARGS = [
     DeclareLaunchArgument(
@@ -77,10 +85,18 @@ def generate_launch_description():
                     'robot_description': robot_description_content
                 }]
             )
-        ])
+        ]),
         
         #TODO: robot interface
-        
-        
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                PathJoinSubstitution([
+                    FindPackageShare(LaunchConfiguration('mowbot_launch_pkg')),
+                    'launch',
+                    'robot_interface.launch.py'
+                ])
+            ),
+            condition=IfCondition(LaunchConfiguration('launch_robot_interface'))
+        )
         
     ])
