@@ -3,7 +3,8 @@ from launch.actions import (
     DeclareLaunchArgument, 
     SetLaunchConfiguration, 
     GroupAction, 
-    IncludeLaunchDescription
+    IncludeLaunchDescription,
+    LogInfo
 )
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -28,7 +29,7 @@ ARGS = [
     ),
     DeclareLaunchArgument(
         'sensor_model',
-        default_value='mowbot_default_sensor_kit',
+        default_value='mowbot_gazebo_sensor_kit',
         description='sensor model name'
     ),
     DeclareLaunchArgument(

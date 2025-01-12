@@ -77,9 +77,12 @@ def generate_launch_description():
             ])
         ),
         launch_arguments={
-            'model': 'mowbot_gazebo_modelv3',
-            'sensor_model': 'mowbot_default_sensor_kit',
             'launch_robot_interface': 'true',
+            'model': 'mowbot_gazebo_modelv3',
+            'sensor_model': 'mowbot_gazebo_sensor_kit',
+            'config_dir': PathJoinSubstitution(
+                [FindPackageShare('mowbot_gazebo_sensor_kit_description'), 'config']
+            )
         }.items()
     )
     

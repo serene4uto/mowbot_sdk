@@ -1,0 +1,8 @@
+/**:
+  ros__parameters:
+    gnss_base_frame: gnss_link
+    gnss_left_frame: gnss_left_link
+    gnss_right_frame: gnss_right_link
+    publish_freq: 10.0
+    use_gnss_ins_orientation_msg: false
+    use_imu_orientation_msg: true
