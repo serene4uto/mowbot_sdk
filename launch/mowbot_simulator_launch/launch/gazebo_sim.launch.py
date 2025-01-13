@@ -2,16 +2,20 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, SetEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import EnvironmentVariable, FindExecutable, LaunchConfiguration, PathJoinSubstitution
+from launch.conditions import UnlessCondition
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+
 
 from ament_index_python.packages import get_package_share_directory
 
 from pathlib import Path
 
 ARGUMENTS = [
+    DeclareLaunchArgument('headless', default_value='false',
+                            description='Whether to launch gazebo in headless mode'),
     DeclareLaunchArgument('world_path', default_value='',
-                          description='The world path, by default is empty.world'),
+                            description='The world path, by default is empty.world'),
     DeclareLaunchArgument('robot_name', default_value='mowbot',
                             description='The name of the robot to spawn'),
     DeclareLaunchArgument('x', default_value='0.0',
@@ -55,7 +59,7 @@ def generate_launch_description():
     gzclient = ExecuteProcess(
         cmd=['gzclient'],
         output='screen',
-        # condition=IfCondition(LaunchConfiguration('gui')),
+        condition=UnlessCondition(LaunchConfiguration('headless'))
     )
     
     spawn_robot_node = Node(
