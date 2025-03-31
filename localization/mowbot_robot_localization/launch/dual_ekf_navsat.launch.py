@@ -6,24 +6,32 @@ from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
-ARGS = []
+ARGS = [
+    DeclareLaunchArgument('use_sim_time', 
+        default_value='false', 
+        description='Use simulation (Gazebo) clock if true'),
+    
+    DeclareLaunchArgument('dual_ekf_navsat_param_path',
+        default_value=PathJoinSubstitution([
+            FindPackageShare('mowbot_robot_localization'),
+            'config',
+            'dual_ekf_navsat.param.yaml'
+        ]),
+        description='Path to the parameter file'),
+]
 
 def generate_launch_description():
     
-    config_path = PathJoinSubstitution([
-        FindPackageShare('mowbot_robot_localization'),
-        'config',
-        'dual_ekf_navsat.param.yaml'
-    ])
-    
     return LaunchDescription(ARGS + [
         Node(
+            namespace='',
             package='robot_localization',
             executable='ekf_node',
             name='ekf_filter_node_odom',
             output='screen',
             parameters=[
-                config_path,
+                LaunchConfiguration('dual_ekf_navsat_param_path'),
+                {'use_sim_time': LaunchConfiguration('use_sim_time')}
             ],
             remappings=[
                 #input
@@ -35,13 +43,14 @@ def generate_launch_description():
         ),
 
         Node(
-            namespace=LaunchConfiguration('namespace'),
+            namespace='',
             package='robot_localization',
             executable='ekf_node',
             name='ekf_filter_node_map',
             output='screen',
             parameters=[
-                config_path,
+                LaunchConfiguration('dual_ekf_navsat_param_path'),
+                {'use_sim_time': LaunchConfiguration('use_sim_time')}
             ],
             remappings=[
                 #input
@@ -54,23 +63,23 @@ def generate_launch_description():
         ),
 
         Node(
-            namespace=LaunchConfiguration('namespace'),
+            namespace='',
             package='robot_localization',
             executable='navsat_transform_node',
             name='navsat_transform',
             output='screen',
             parameters=[
-                config_path,
+                LaunchConfiguration('dual_ekf_navsat_param_path'),
+                {'use_sim_time': LaunchConfiguration('use_sim_time')}
             ],
             remappings=[
                 #input
                 ("odometry/filtered", "odometry/global"),
-                ("gps/fix", "/gnss/fix"),
+                ("gps/fix", "/gnss_fused/fix"),
                 ("imu", "imu/data"),
                 #output
                 ("odometry/gps", "odometry/gnss"),
                 ("gps/filtered", "gnss/filtered"),
             ]
         ),
-            
     ])

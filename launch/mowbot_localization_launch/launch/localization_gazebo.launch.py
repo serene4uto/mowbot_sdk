@@ -6,43 +6,25 @@ from launch_ros.substitutions import FindPackageShare
 
 
 ARGS = [
-    # DeclareLaunchArgument('gnss_fuser_param_path',
-    #     default_value='',
-    #     description='Path to the parameter file'),
-    # DeclareLaunchArgument('imu_filter_madgwick_param_path',
+    # DeclareLaunchArgument('dual_ekf_navsat_param_path',
     #     default_value='',
     #     description='Path to the parameter file'),
 ]
 
-
 def generate_launch_description():
-    
     
     return LaunchDescription(ARGS + [
         
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 PathJoinSubstitution([
-                    FindPackageShare('mowbot_gnss_fuser'),
+                    FindPackageShare('mowbot_robot_localization'),
                     'launch',
-                    'gnss_fuser.launch.py'
+                    'dual_ekf_navsat.launch.py'
                 ])
             ),
             launch_arguments={
             }.items()
         ),
-        
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                PathJoinSubstitution([
-                    FindPackageShare('mowbot_imu_filter_madgwick'),
-                    'launch',
-                    'imu_filter_madgwick.launch.py'
-                ])
-            ),
-            launch_arguments={
-            }.items()
-        ),
-        
         
     ])
